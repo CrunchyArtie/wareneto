@@ -1,0 +1,49 @@
+name: warene
+recipe: laravel
+config:
+  webroot: ./public
+  php: '8.1'
+#  xdebug: true
+services:
+  appserver:
+    build:
+      - composer install
+    overrides:
+      environment:
+        # Support debugging CLI with XDEBUG.
+        PHP_IDE_CONFIG: "serverName=appserver"
+        XDEBUG_SESSION_START: lando
+#    xdebug: true
+    build_as_root:
+      - rm -f /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && /etc/init.d/apache2 reload
+    config:
+      php: .lando/php.ini
+#  node:
+#    type: node:16
+#    scanner: false
+#    ports:
+#      - 3009:3009
+#    build:
+#      - npm install
+tooling:
+#  npm:
+#    service: node
+#  dev:
+#    service: node
+#    cmd: npm run dev
+#  build:
+#    service: node
+#    cmd: npm run build
+  xdebug-on:
+    service: appserver
+    description: Enable xdebug for Apache.
+    cmd: rm -f /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && docker-php-ext-enable xdebug && /etc/init.d/apache2 reload && echo "Xdebug enabled"
+    user: root
+  xdebug-off:
+    service: appserver
+    description: Disable xdebug for Apache.
+    cmd: rm -f /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && /etc/init.d/apache2 reload && echo "Xdebug disabled"
+    user: root
+excludes:
+  - vendor
+  - node_modules
