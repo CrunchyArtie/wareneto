@@ -1,4 +1,4 @@
-name: warene
+name: wareneto
 recipe: laravel
 config:
   webroot: ./public
